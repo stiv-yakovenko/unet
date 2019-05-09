@@ -16,7 +16,7 @@ testGene = testGenerator("data/cracks/test",as_gray=False)
 
 model = unet()
 model_checkpoint = ModelCheckpoint('unet_cracks.hdf5', monitor='loss',verbose=1, save_best_only=True)
-model.fit_generator(myGene,steps_per_epoch=500,epochs=3,callbacks=[model_checkpoint])
+model.fit_generator(myGene,steps_per_epoch=900,epochs=12,callbacks=[model_checkpoint])
 
 results = model.predict_generator(testGene,30,verbose=1)
 saveResult("data/cracks/test",results)
