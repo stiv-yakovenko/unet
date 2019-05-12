@@ -28,7 +28,14 @@ def jaccard_distance_loss(y_true, y_pred, smooth=100):
     sum_ = K.sum(K.abs(y_true) + K.abs(y_pred), axis=-1)
     jac = (intersection + smooth) / (sum_ - intersection + smooth)
     return (1 - jac) * smooth
-
+def dice_coef_binary(y_true, y_pred, smooth=1e-7):
+    y_true_f = K.flatten(K.one_hot(K.cast(y_true, 'int32'), num_classes=2)[...,1:])
+    y_pred_f = K.flatten(y_pred[...,1:])
+    intersect = K.sum(y_true_f * y_pred_f, axis=-1)
+    denom = K.sum(y_true_f + y_pred_f, axis=-1)
+    return K.mean((2. * intersect / (denom + smooth)))
+def dice_coef_binary_loss(y_true, y_pred):
+    return 1 - dice_coef_binary(y_true, y_pred)
 def unet(pretrained_weights = None,input_size = (256,256,3)):
     inputs = Input(input_size)
     conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(inputs)
@@ -73,7 +80,7 @@ def unet(pretrained_weights = None,input_size = (256,256,3)):
 
     model = Model(input = inputs, output = conv10)
 
-    model.compile(optimizer = Adam(lr = 1e-4), loss = generalized_dice_loss, metrics = ['accuracy'])
+    model.compile(optimizer = Adam(lr = 1e-4), loss = dice_coef_binary_loss, metrics = ['accuracy'])
     
     #model.summary()
 
