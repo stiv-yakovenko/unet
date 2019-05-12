@@ -9,6 +9,19 @@ from keras.optimizers import *
 from keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from keras import backend as keras
 
+def generalized_dice_loss(labels, logits):
+    smooth = 1e-17
+    shape = tf.TensorShape(logits.shape).as_list()
+    depth = int(shape[-1])
+    labels = tf.one_hot(labels, depth, dtype=tf.float32)
+    logits = tf.nn.softmax(logits)
+    weights = 1.0 / (tf.reduce_sum(labels, axis=[0, 1, 2])**2)
+    numerator = tf.reduce_sum(labels * logits, axis=[0, 1, 2])
+    numerator = tf.reduce_sum(weights * numerator)
+    denominator = tf.reduce_sum(labels + logits, axis=[0, 1, 2])
+    denominator = tf.reduce_sum(weights * denominator)
+    loss = 1.0 - 2.0*(numerator + smooth)/(denominator + smooth)
+    return loss
 
 def jaccard_distance_loss(y_true, y_pred, smooth=100):
     intersection = K.sum(K.abs(y_true * y_pred), axis=-1)
@@ -60,7 +73,7 @@ def unet(pretrained_weights = None,input_size = (256,256,3)):
 
     model = Model(input = inputs, output = conv10)
 
-    model.compile(optimizer = Adam(lr = 1e-4), loss = jaccard_distance_loss, metrics = ['accuracy'])
+    model.compile(optimizer = Adam(lr = 1e-4), loss = generalized_dice_loss, metrics = ['accuracy'])
     
     #model.summary()
 
