@@ -10,6 +10,12 @@ from keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from keras import backend as keras
 
 
+def jaccard_distance_loss(y_true, y_pred, smooth=100):
+    intersection = K.sum(K.abs(y_true * y_pred), axis=-1)
+    sum_ = K.sum(K.abs(y_true) + K.abs(y_pred), axis=-1)
+    jac = (intersection + smooth) / (sum_ - intersection + smooth)
+    return (1 - jac) * smooth
+
 def unet(pretrained_weights = None,input_size = (256,256,3)):
     inputs = Input(input_size)
     conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(inputs)
@@ -54,7 +60,7 @@ def unet(pretrained_weights = None,input_size = (256,256,3)):
 
     model = Model(input = inputs, output = conv10)
 
-    model.compile(optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy', metrics = ['accuracy'])
+    model.compile(optimizer = Adam(lr = 1e-4), loss = jaccard_distance_loss, metrics = ['accuracy'])
     
     #model.summary()
 

@@ -3,7 +3,6 @@ import sys
 from model import *
 from data import *
 
-#os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 if (len(sys.argv)<2):
     print("set dataset folder")
     sys.exit(0)
@@ -18,7 +17,7 @@ data_gen_args = dict(rotation_range=0.2,
 myGene = trainGenerator(2,'data/'+dataset+'/train','image','label',data_gen_args,save_to_dir = None,image_color_mode='rgb')
 testGene = testGenerator("data/"+dataset+"/test",as_gray=False)
 
-model = unet()
+model = unet(pretrained_weights='unet_'+dataset+'.hdf5')
 model_checkpoint = ModelCheckpoint('unet_'+dataset+'.hdf5', monitor='loss',verbose=1, save_best_only=True)
 model.fit_generator(myGene,steps_per_epoch=300,epochs=12,callbacks=[model_checkpoint])
 
