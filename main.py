@@ -19,7 +19,7 @@ testGene = testGenerator("data/"+dataset+"/test",as_gray=False)
 #pretrained_weights='unet_'+dataset+'.hdf5'
 model = unet()
 model_checkpoint = ModelCheckpoint('unet_'+dataset+'.hdf5', monitor='loss',verbose=1, save_best_only=True)
-model.fit_generator(myGene,steps_per_epoch=300,epochs=42,callbacks=[model_checkpoint])
+model.fit_generator(myGene,steps_per_epoch=300,epochs=22,callbacks=[model_checkpoint])
 
 results = model.predict_generator(testGene,30,verbose=1)
 saveResult("data/"+dataset+"/predict",results)
