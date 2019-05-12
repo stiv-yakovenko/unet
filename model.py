@@ -22,7 +22,13 @@ def generalized_dice_loss(labels, logits):
     denominator = tf.reduce_sum(weights * denominator)
     loss = 1.0 - 2.0*(numerator + smooth)/(denominator + smooth)
     return loss
-
+def dice_coef(y_true, y_pred):
+    y_true_f = K.flatten(y_true)
+    y_pred_f = K.flatten(y_pred)
+    intersection = K.sum(y_true_f * y_pred_f)
+    return (2. * intersection + 1.) / (K.sum(y_true_f) + K.sum(y_pred_f) + 1.)
+def dice_coef_loss(y_true, y_pred):
+    return 1-dice_coef(y_true, y_pred)
 def jaccard_distance_loss(y_true, y_pred, smooth=100):
     intersection = K.sum(K.abs(y_true * y_pred), axis=-1)
     sum_ = K.sum(K.abs(y_true) + K.abs(y_pred), axis=-1)
@@ -80,7 +86,7 @@ def unet(pretrained_weights = None,input_size = (256,256,3)):
 
     model = Model(input = inputs, output = conv10)
 
-    model.compile(optimizer = Adam(lr = 1e-4), loss = dice_coef_binary_loss, metrics = ['accuracy'])
+    model.compile(optimizer = Adam(lr = 1e-4), loss = dice_coef_loss, metrics = ['accuracy'])
     
     #model.summary()
 
