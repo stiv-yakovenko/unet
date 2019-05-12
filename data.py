@@ -90,6 +90,7 @@ def testGenerator(test_path,target_size = (256,256),flag_multi_class = False,as_
                 , fls)
     fls = sorted(list(fr), key=lambda f: int(f.lower().replace(".png", "")))
     for f in fls:
+        # print(f)
         img = io.imread(test_path+"/"+f,as_gray = as_gray)
         if(img.shape[2]==4):
             img=rgba2rgb(img)
