@@ -1,6 +1,7 @@
 from __future__ import print_function
 from keras.preprocessing.image import ImageDataGenerator
-import numpy as np 
+from skimage.color import rgba2rgb
+import numpy as np
 import os
 import glob
 import skimage.io as io
@@ -90,6 +91,8 @@ def testGenerator(test_path,target_size = (256,256),flag_multi_class = False,as_
     fls = sorted(list(fr), key=lambda f: int(f.lower().replace(".png", "")))
     for f in fls:
         img = io.imread(test_path+"/"+f,as_gray = as_gray)
+        if(img.shape[2]==4):
+            img=rgba2rgb(img)
         img = img / 255
         img = trans.resize(img,target_size)
         img = np.reshape(img,(1,)+img.shape)
