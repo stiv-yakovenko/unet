@@ -7,7 +7,7 @@ from data import *
 if (len(sys.argv)<2):
     print("set dataset folder")
     sys.exit(0)
-dataset = sys.argv[0]
+dataset = sys.argv[1]
 data_gen_args = dict(rotation_range=0.2,
                     width_shift_range=0.05,
                     height_shift_range=0.05,
