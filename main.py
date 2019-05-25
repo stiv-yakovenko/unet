@@ -36,6 +36,7 @@ model_checkpoint = ModelCheckpoint('unet_'+dataset+'.hdf5', monitor='loss',verbo
 class onEpoch(Callback):
     def on_epoch_end(self, batch, logs=None):
         print("saving predict data")
+        testGene = testGenerator("data/" + dataset + "/test", as_gray=False)
         results = model.predict_generator(testGene,10,verbose=1)
         saveResult("data/"+dataset+"/predict",results)
 
