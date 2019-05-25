@@ -25,7 +25,16 @@ myGene = trainGenerator(1,'data/'+dataset+'/train','image','label',data_gen_args
 #         pic = image.transpose(2,1,0)
 #         plt.imshow(pic.transpose())
 #         plt.show()
-
+class TerminateOnNaN(Callback):
+    def __init__(self):
+        super(TerminateOnNaN, self).__init__()
+    def on_batch_end(self, batch, logs=None):
+        logs = logs or {}
+        loss = logs.get('loss')
+        if loss is not None:
+            if np.isnan(loss) or np.isinf(loss):
+                print('Batch %d: Invalid loss, terminating training' % (batch))
+                self.model.stop_training = True
 testGene = testGenerator("data/"+dataset+"/test",as_gray=False)
 #pretrained_weights='unet_'+dataset+'.hdf5'
 model = unet()

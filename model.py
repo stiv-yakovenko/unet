@@ -43,6 +43,19 @@ def jaccard_distance_loss(y_true, y_pred, smooth=100):
     sum_ = K.sum(K.abs(y_true) + K.abs(y_pred), axis=-1)
     jac = (intersection + smooth) / (sum_ - intersection + smooth)
     return (1 - jac) * smooth
+class SoftDiceLoss(nn.Module):
+    def __init__(self, weight=None, size_average=True):
+        super(SoftDiceLoss, self).__init__()
+    def forward(self, logits, targets):
+        smooth = 1
+        num = targets.size(0)
+        probs = F.sigmoid(logits)
+        m1 = probs.view(num, -1)
+        m2 = targets.view(num, -1)
+        intersection = (m1 * m2)
+        score = 2. * (intersection.sum(1) + smooth) / (m1.sum(1) + m2.sum(1) + smooth)
+        score = 1 - score.sum() / num
+        return score
 def unet(pretrained_weights = None,input_size = (256,256,3)):
     inputs = Input(input_size)
     conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(inputs)
@@ -87,7 +100,7 @@ def unet(pretrained_weights = None,input_size = (256,256,3)):
 
     model = Model(input = inputs, output = conv10)
 
-    model.compile(optimizer = Adam(lr=1e-4), loss = 'binary_crossentropy', metrics = ['accuracy',mean_iou])
+    model.compile(optimizer = Adam(lr=1e-4), loss = SoftDiceLoss, metrics = ['accuracy',mean_iou])
     # model.summary()
 
     if(pretrained_weights):
