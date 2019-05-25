@@ -18,13 +18,13 @@ data_gen_args = dict(rotation_range=0.2,
                     horizontal_flip=True,
                     fill_mode='nearest')
 myGene = trainGenerator(2,'data/'+dataset+'/train','image','label',data_gen_args,save_to_dir = None,image_color_mode='rgb')
-while True:
-    x,y = myGene.__next__()
-    for i in range(0,1):
-        image = y[i]
-        pic = image.transpose(2,1,0)
-        plt.imshow(pic.transpose())
-        plt.show()
+# while True:
+#     x,y = myGene.__next__()
+#     for i in range(0,1):
+#         image = y[i]
+#         pic = image.transpose(2,1,0)
+#         plt.imshow(pic.transpose())
+#         plt.show()
 
 testGene = testGenerator("data/"+dataset+"/test",as_gray=False)
 #pretrained_weights='unet_'+dataset+'.hdf5'
