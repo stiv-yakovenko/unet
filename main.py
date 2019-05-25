@@ -29,18 +29,20 @@ myGene = trainGenerator(1,'data/'+dataset+'/train','image','label',data_gen_args
 #         pic = image.transpose(2,1,0)
 #         plt.imshow(pic.transpose())
 #         plt.show()
-class onEpoch(Callback):
-    def on_epoch_end(self, batch, logs=None):
-        print("saving predict data")
-
 testGene = testGenerator("data/"+dataset+"/test",as_gray=False)
 #pretrained_weights='unet_'+dataset+'.hdf5'
 model = unet()
 model_checkpoint = ModelCheckpoint('unet_'+dataset+'.hdf5', monitor='loss',verbose=1, save_best_only=True)
+class onEpoch(Callback):
+    def on_epoch_end(self, batch, logs=None):
+        print("saving predict data")
+        results = model.predict_generator(testGene,10,verbose=1)
+        saveResult("data/"+dataset+"/predict",results)
+
 clr = CyclicLR(base_lr=0.000002, max_lr=0.00019,
                         step_size=80.)
 hist=model.fit_generator(myGene,steps_per_epoch=300,
-                         epochs=258,callbacks=[model_checkpoint,csv_logger,clr,onEpoch],
+                         epochs=258,callbacks=[model_checkpoint,csv_logger,clr,onEpoch()],
                          verbose=2,shuffle=True)
 
 results = model.predict_generator(testGene,10,verbose=1)
