@@ -39,10 +39,10 @@ testGene = testGenerator("data/"+dataset+"/test",as_gray=False)
 #pretrained_weights='unet_'+dataset+'.hdf5'
 model = unet()
 model_checkpoint = ModelCheckpoint('unet_'+dataset+'.hdf5', monitor='loss',verbose=1, save_best_only=True)
-clr = CyclicLR(base_lr=0.000005, max_lr=0.00009,
-                        step_size=100.)
+clr = CyclicLR(base_lr=0.000002, max_lr=0.00019,
+                        step_size=80.)
 hist=model.fit_generator(myGene,steps_per_epoch=300,
-                         epochs=58,callbacks=[model_checkpoint,csv_logger,clr,onEpoch],
+                         epochs=258,callbacks=[model_checkpoint,csv_logger,clr],
                          verbose=2,shuffle=True)
 
 results = model.predict_generator(testGene,10,verbose=1)
