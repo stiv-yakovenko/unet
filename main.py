@@ -40,7 +40,7 @@ testGene = testGenerator("data/"+dataset+"/test",as_gray=False)
 model = unet()
 model_checkpoint = ModelCheckpoint('unet_'+dataset+'.hdf5', monitor='loss',verbose=1, save_best_only=True)
 hist=model.fit_generator(myGene,steps_per_epoch=300,
-                         epochs=28,callbacks=[model_checkpoint,csv_logger],
+                         epochs=58,callbacks=[model_checkpoint,csv_logger],
                          verbose=2,shuffle=True)
 
 results = model.predict_generator(testGene,10,verbose=1)
