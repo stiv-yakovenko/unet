@@ -8,6 +8,9 @@ from keras.layers import *
 from keras.optimizers import *
 from keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from keras import backend as keras
+from tensorflow.python.ops import nn
+
+
 def mean_iou(y_true, y_pred):
     prec = []
     for t in np.arange(0.0, 1.0, 0.05):
