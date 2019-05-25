@@ -1,6 +1,9 @@
+from keras.callbacks import *
 import sys
 import numpy
 import matplotlib.pyplot as plt
+
+from clr_callback import CyclicLR
 from model import *
 from data import *
 from keras.callbacks import CSVLogger
@@ -25,22 +28,22 @@ myGene = trainGenerator(1,'data/'+dataset+'/train','image','label',data_gen_args
 #         pic = image.transpose(2,1,0)
 #         plt.imshow(pic.transpose())
 #         plt.show()
-# class TerminateOnNaN(Callback):
-#     def __init__(self):
-#         super(TerminateOnNaN, self).__init__()
-#     def on_batch_end(self, batch, logs=None):
-#         logs = logs or {}
-#         loss = logs.get('loss')
-#         if loss is not None:
-#             if np.isnan(loss) or np.isinf(loss):
-#                 print('Batch %d: Invalid loss, terminating training' % (batch))
-#                 self.model.stop_training = True
+class onEpoch(Callback):
+    def __init__(self):
+        super(onEpoch, self).__init__()
+    def on_epoch_end(self, batch, logs=None):
+        print("saving predict data")
+        results = model.predict_generator(testGene, 10, verbose=1)
+        saveResult("data/" + dataset + "/predict", results)
+
 testGene = testGenerator("data/"+dataset+"/test",as_gray=False)
 #pretrained_weights='unet_'+dataset+'.hdf5'
 model = unet()
 model_checkpoint = ModelCheckpoint('unet_'+dataset+'.hdf5', monitor='loss',verbose=1, save_best_only=True)
+clr = CyclicLR(base_lr=0.0005, max_lr=0.006,
+                        step_size=2000.)
 hist=model.fit_generator(myGene,steps_per_epoch=300,
-                         epochs=58,callbacks=[model_checkpoint,csv_logger],
+                         epochs=58,callbacks=[model_checkpoint,csv_logger,clr,onEpoch],
                          verbose=2,shuffle=True)
 
 results = model.predict_generator(testGene,10,verbose=1)
