@@ -32,8 +32,6 @@ myGene = trainGenerator(1,'data/'+dataset+'/train','image','label',data_gen_args
 class onEpoch(Callback):
     def on_epoch_end(self, batch, logs=None):
         print("saving predict data")
-        results = model.predict_generator(testGene, 10, verbose=1)
-        saveResult("data/" + dataset + "/predict", results)
 
 testGene = testGenerator("data/"+dataset+"/test",as_gray=False)
 #pretrained_weights='unet_'+dataset+'.hdf5'
