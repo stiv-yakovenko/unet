@@ -43,7 +43,7 @@ model_checkpoint = ModelCheckpoint('unet_'+dataset+'.hdf5', monitor='loss',verbo
 clr = CyclicLR(base_lr=0.0005, max_lr=0.006,
                         step_size=2000.)
 hist=model.fit_generator(myGene,steps_per_epoch=300,
-                         epochs=58,callbacks=[model_checkpoint,csv_logger,clr,onEpoch],
+                         epochs=58,callbacks=[model_checkpoint,csv_logger,clr],
                          verbose=2,shuffle=True)
 
 results = model.predict_generator(testGene,10,verbose=1)
