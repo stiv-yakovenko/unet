@@ -8,7 +8,16 @@ from keras.layers import *
 from keras.optimizers import *
 from keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from keras import backend as keras
-
+def mean_iou(y_true, y_pred):
+    prec = []
+    for t in np.arange(0.0, 1.0, 0.05):
+        y_pred_ = tf.to_int32(y_pred > t)
+        score, up_opt = tf.metrics.mean_iou(y_true, y_pred_, 2)
+        K.get_session().run(tf.local_variables_initializer())
+        with tf.control_dependencies([up_opt]):
+            score = tf.identity(score)
+        prec.append(score)
+    return K.mean(K.stack(prec), axis=0)
 def generalized_dice_loss(labels, logits):
     smooth = 1e-17
     shape = tf.TensorShape(logits.shape).as_list()
@@ -34,14 +43,6 @@ def jaccard_distance_loss(y_true, y_pred, smooth=100):
     sum_ = K.sum(K.abs(y_true) + K.abs(y_pred), axis=-1)
     jac = (intersection + smooth) / (sum_ - intersection + smooth)
     return (1 - jac) * smooth
-def dice_coef_binary(y_true, y_pred, smooth=1e-7):
-    y_true_f = K.flatten(K.one_hot(K.cast(y_true, 'int32'), num_classes=2)[...,1:])
-    y_pred_f = K.flatten(y_pred[...,1:])
-    intersect = K.sum(y_true_f * y_pred_f, axis=-1)
-    denom = K.sum(y_true_f + y_pred_f, axis=-1)
-    return K.mean((2. * intersect / (denom + smooth)))
-def dice_coef_binary_loss(y_true, y_pred):
-    return 1 - dice_coef_binary(y_true, y_pred)
 def unet(pretrained_weights = None,input_size = (256,256,3)):
     inputs = Input(input_size)
     conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(inputs)
@@ -86,9 +87,8 @@ def unet(pretrained_weights = None,input_size = (256,256,3)):
 
     model = Model(input = inputs, output = conv10)
 
-    model.compile(optimizer = Adam(lr = 3e-4), loss = 'binary_crossentropy', metrics = ['accuracy'])
-    
-    #model.summary()
+    model.compile(optimizer = Adam(lr=3e-4), loss = 'binary_crossentropy', metrics = ['accuracy',mean_iou])
+    # model.summary()
 
     if(pretrained_weights):
     	model.load_weights(pretrained_weights)
