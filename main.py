@@ -21,7 +21,7 @@ data_gen_args = dict(rotation_range=0.2,
                     horizontal_flip=True,
                     fill_mode='nearest')
 data_gen_args = dict()
-myGene = trainGenerator(1,'data/'+dataset+'/train','image','label',data_gen_args,save_to_dir = None,image_color_mode='rgb')
+myGene = trainGenerator(10,'data/'+dataset+'/train','image','label',data_gen_args,save_to_dir = None,image_color_mode='rgb')
 # while True:
 #     x,y = myGene.__next__()
 #     for i in range(0,1):
