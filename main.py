@@ -43,7 +43,7 @@ class onEpoch(Callback):
 clr = CyclicLR(base_lr=0.000002, max_lr=0.00199,
                         step_size=1280.)
 hist=model.fit_generator(myGene,steps_per_epoch=70,
-                         epochs=858,callbacks=[model_checkpoint,csv_logger,clr,onEpoch()],
+                         epochs=858,callbacks=[model_checkpoint,csv_logger,onEpoch()],
                          verbose=2,shuffle=True)
 
 results = model.predict_generator(testGene,10,verbose=1)
