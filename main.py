@@ -41,7 +41,7 @@ class onEpoch(Callback):
         saveResult("data/"+dataset+"/predict",results)
 
 clr = CyclicLR(base_lr=0.00001, max_lr=0.0006,
-                        step_size=1280.)
+                        step_size=280.)
 hist=model.fit_generator(myGene,steps_per_epoch=40,
                          epochs=858,callbacks=[model_checkpoint,csv_logger,clr,onEpoch()],
                          verbose=2,shuffle=True)
